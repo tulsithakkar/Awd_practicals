@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="angular.js" ></script>
+    <script src="controller.js"></script>
+   <style>
+        .product-container{
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .product-card{
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 16px;
+            width: 200px;
+            text-align: center;
+            
+        }
+        .product-card img{
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px;
+        }
+   </style>
+</head>
+<body ng-app="productApp" ng-controller="productconttroller">
+    <h1>product list</h1>
+    <div class="product-container">
+        <div ng-repeat="product in products" class="product-card" >
+            <img height="100" ng-src="{{product.image}}" alt="{{product.name}}">
+            <h1>{{product.name}}</h1>
+            <p>{{product.category}}</p>
+            <p>{{product.price}}</p>
+        </div>
+    </div>
+   
+</body>
+</html>

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <script src="angular.js"></script>
+    <script src="controller.js"></script>
+    <script src="../server.js"></script>
+</head>
+<body ng-app="studApp" ng-controller="studCtrl" class="container mt-5">
+    <div class="card p-4">
+        <h1 class="text-center">Login Form</h1>
+        <form ng-submit="checkUser()" class="mt-4">
+            <div class="form-group">
+                <label>Username:</label>
+                <input type="text" ng-model="username" class="form-control" placeholder="Enter your Username" required>
+            </div>
+            <div class="form-group">
+                <label>Password:</label>
+                <input type="password" ng-model="password" class="form-control" placeholder="Enter your Password" required>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Login</button>
+        </form>
+    </div>
+
+    <div ng-if="loginStatus" class="mt-5">
+        <div class="alert alert-success" role="alert">
+            <h2 class="text-center">User Valid</h2>
+            <p class="text-center">Role: {{ userRole }}</p>
+        </div>
+
+        <div ng-if="userRole === 'admin'">
+            <h3>Manage Students:</h3>
+            <table class="table table-bordered mt-4">
+                <thead class="thead-dark">
+                    <tr>
+                        <th>Student ID</th>
+                        <th>Name</th>
+                        <th>Course</th>
+                        <th>Semester</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="student in students track by $index">
+                        <td>{{ student.studID }}</td>
+                        <td>
+                            <span ng-if="!student.editing">{{ student.studName }}</span>
+                            <input ng-if="student.editing" type="text" ng-model="student.studName" class="form-control" required />
+                        </td>
+                        <td>
+                            <span ng-if="!student.editing">{{ student.course }}</span>
+                            <input ng-if="student.editing" type="text" ng-model="student.course" class="form-control" required />
+                        </td>
+                        <td>
+                            <span ng-if="!student.editing">{{ student.semester }}</span>
+                            <select ng-if="student.editing" ng-model="student.semester" class="form-control" required>
+                                <option value="" disabled>Select Semester</option>
+                                <option ng-repeat="sem in [1, 2, 3, 4, 5, 6]" value="{{sem}}">{{sem}}</option>
+                            </select>
+                        </td>
+                        <td>
+                            <span ng-if="!student.editing">{{ student.status }}</span>
+                            <div ng-if="student.editing" class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" ng-model="student.status" value="Active" ng-checked="student.status === 'Active'"> 
+                                <label class="form-check-label">Active</label>
+                                <input class="form-check-input ml-3" type="radio" ng-model="student.status" value="Inactive" ng-checked="student.status === 'Inactive'"> 
+                                <label class="form-check-label">Inactive</label>
+                            </div>
+                        </td>
+                        <td>
+                            <button ng-if="!student.editing" ng-click="editStudent(student)" class="btn btn-sm btn-warning">Edit</button>
+                            <button ng-if="student.editing" ng-click="saveStudent(student)" class="btn btn-sm btn-success">Save</button>
+                            <button ng-click="deleteStudent(student.studID)" class="btn btn-sm btn-danger">Delete</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <button ng-click="addstat = (addstat === 0 ? 1 : 0)" class="btn btn-primary mt-3">{{ addstat === 0 ? 'Add New Student' : 'Cancel' }}</button>
+
+            <div ng-if="addstat === 1" class="mt-4">
+                <h4>Add New Student:</h4>
+                <form ng-submit="addStudent()" class="form">
+                    <div class="form-group">
+                        <label>Student ID:</label>
+                        <input type="text" ng-model="newStudent.studID" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Name:</label>
+                        <input type="text" ng-model="newStudent.studName" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Course:</label>
+                        <input type="text" ng-model="newStudent.course" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Semester:</label>
+                        <select ng-model="newStudent.semester" class="form-control" required>
+                            <option value="" disabled>Select Semester</option>
+                            <option ng-repeat="sem in [1, 2, 3, 4, 5, 6]" value="{{sem}}">{{sem}}</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Status:</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" ng-model="newStudent.status" value="Active" checked>
+                            <label class="form-check-label">Active</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" ng-model="newStudent.status" value="Inactive">
+                            <label class="form-check-label">Inactive</label>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-success">Add Student</button>
+                </form>
+            </div>
+        </div>
+
+        <div ng-if="userRole === 'student'" class="mt-5">
+            <h3>Your Details:</h3>
+            <table class="table table-bordered">
+                <tr>
+                    <th>Student ID</th>
+                    <th>Name</th>
+                    <th>Course</th>
+                    <th>Semester</th>
+                    <th>Status</th>
+                </tr>
+                <tr ng-if="studentDetails">
+                    <td>{{ studentDetails.studID }}</td>
+                    <td>{{ studentDetails.studName }}</td>
+                    <td>{{ studentDetails.course }}</td>
+                    <td>{{ studentDetails.semester }}</td>
+                    <td>{{ studentDetails.status }}</td>
+                </tr>
+            </table>
+        </div>
+        <button ng-click="logout()" class="btn btn-danger mt-3">Logout</button>
+    </div>
+
+    <div ng-if="loginStatus === false" class="mt-5">
+        <div class="alert alert-danger" role="alert">
+            <h2 class="text-center">User Invalid</h2>
+            <p>{{ loginMessage }}</p>
+        </div>
+    </div>
+    <br><br><br>
+
+</body>
+</html>

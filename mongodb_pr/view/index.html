@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="angular.js"></script>
+    <script src="controller.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <title>Document</title>
+</head>
+<body ng-app="userApp" ng-controller="userCtrl">
+    <div class="container mt-5">
+        <h1 class="mb-4">User management</h1>
+
+        <div class="mb-3">
+            <input type="search" ng-model="serData" class="form-control" placeholder="serch user.."> 
+        </div>
+
+        <div class="mb-3">
+            <div class="form-chek form-check-inline">
+                <input class="from-check-input" type="radio" ng-model="sort" name="rdsort" value="asc" id="sortAsc" checked>
+                <label class="form-chek-lable " for="sortAsc">Sort acsending</label>
+            </div>
+
+            <div class="form-chek form-check-inline">
+                <input class="from-check-input" type="radio" ng-model="sort" name="rdsort" value="desc" id="sortdesc" checked>
+                <label class="form-chek-lable " for="sortdesc">Sort descending</label>
+            </div>
+        </div>
+
+        <!--user table-->
+        <table class="table table-bordered table-hover text-center">
+            <thead class="table-dark">
+                <tr>
+                    <th>Sr no.</th>
+                    <th>User Id</th>
+                    <th>user name</th>
+                    <th>age</th>
+                    <th>contact</th>
+                    <th>role</th>
+                    <th colspan="2">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr ng-if="users.length ===0">
+                    <td colspan="8" class="text-center text-danger">
+                        {{msg || 'no users found'}}
+                    </td>
+                </tr>
+
+                <tr ng-repeat="item in users | filter:serData | orderBy:sort === 'asc' ? 'userId' : '-userId' track by $index">
+                    <td>{{$index + 1}}</td>
+                    <td>{{item.userId}}</td>
+                    <td>
+                        <span ng-if="editUserId !== item.userId">{{item.userName}}</span>
+                        <span ng-if="editUserId === item.userId">
+                            <input type="text" ng-model="item.userName" class="form-control" required>
+                        </span>
+                    </td>
+                    <td>
+                        <span ng-if="editUserId !== item.userId">{{item.age}}</span>
+                        <span ng-if="editUserId === item.userId">
+                            <input type="number" ng-model="item.age" class="form-control" required>
+                        </span>
+                    </td>
+                    <td>
+                        <span ng-if="editUserId !== item.userId">{{item.contact}}</span>
+                        <span ng-if="editUserId === item.userId">
+                            <input type="text" ng-model="item.contact" class="form-control" required>
+                        </span>
+                    </td>
+                    <td>
+                        <span ng-if="editUserId !== item.userId">{{item.role}}</span>
+                        <span ng-if="editUserId === item.userId">
+                            <input type="text" ng-model="item.role" class="form-control" required>
+                        </span>
+                    </td>
+                    <td>
+                        <!-- Edit Button -->
+                        <span ng-if="editUserId !== item.userId">
+                            <button type="button" ng-click="editUser(item.userId)" class="btn btn-warning">Edit</button>
+                        </span>
+                        <!-- Save Button -->
+                        <span ng-if="editUserId === item.userId">
+                            <button type="button" ng-click="saveUser(item)" class="btn btn-success">Save</button>
+                        </span>
+                    </td>
+                    <td>
+                        <button type="button" ng-click="deleteUser(item.userId)" class="btn btn-danger">Delete</button>
+                    </td>
+                </tr>
+                
+            </tbody>
+        </table>
+
+        <div class="text-center mt-3" ng-bind="msg"></div>
+
+        <button type="button" ng-click="addstat = addstat ===1 ? 0:1" class=" btn btn-success">
+            Add new user
+        </button>
+
+        <div ng-if="addstat==1">
+            <form ng-submit="addUser()" name="userForm"novalidate>
+                <div class="mb-3">
+                    <input type="text" ng-model="newUser.userId" placeholder="enter userid" required class="form-control">
+                </div>
+                <div class="mb-3">
+                    <input type="text" ng-model="newUser.userName" placeholder="enter user name" required class="form-control">
+                </div>
+                <div class="mb-3">
+                    <input type="number" ng-model="newUser.age" placeholder="enter age" required class="form-control">
+                </div>
+                <div class="mb-3">
+                    <input type="text" ng-model="newUser.contact" placeholder="enter contact" required class="form-control">
+                </div>
+                <div class="mb-3">
+                    <input type="text" ng-model="newUser.role" placeholder="enter role" required class="form-control">
+                </div>
+
+                <button type="submit" class="btn btn-success" ng-disabled="userForm.$invalid" >submit</button>
+            </form>
+
+        </div>
+
+
+
+
+
+
+
+
+
+
+    </div>
+</body>
+</html>
